@@ -15,7 +15,10 @@ import com.weather.app.util.Utility;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -71,6 +74,18 @@ public class ChooseAreaActivity extends Activity implements OnItemClickListener{
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
+		boolean from_weather_activity=getIntent().getBooleanExtra("from_weather_activity", false);
+		if(!from_weather_activity){
+			//如果不是从WeatherActivity点击了Home键来到这个页面的，就说明是刚刚启动
+			SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(this);
+			if(prefs.getBoolean("city_selected", false)){
+				//如果当前存储了本地天气信息,就直接显示本地天气信息
+				Intent intent=new Intent(this,WeatherActivity.class);
+				startActivity(intent);
+				finish();
+				return;
+			}
+		}
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.choose_area);
 		listView=(ListView)findViewById(R.id.list_view);
@@ -96,6 +111,13 @@ public class ChooseAreaActivity extends Activity implements OnItemClickListener{
 			LogUtil.d(TAG, "You clicked a city...");
 			queryCounties();
 		}
+		else if(currentLevel==LEVEL_COUNTY){
+			String countyCode=countyList.get(index).getCountyCode();
+			Intent intent=new Intent(ChooseAreaActivity.this,WeatherActivity.class);
+			intent.putExtra("county_code", countyCode);
+			startActivity(intent);
+			finish();
+		}
 	}
 	
 	/**
@@ -104,6 +126,7 @@ public class ChooseAreaActivity extends Activity implements OnItemClickListener{
 	private void queryProvinces(){
 		provinceList=weatherDB.loadProvinces();
 		if(provinceList.size()>0){
+			LogUtil.d(TAG, "ChooseAreaActivity: There are provinces stored");
 			dataList.clear();
 			for(Province province:provinceList){
 				dataList.add(province.getProvinceName());

@@ -9,7 +9,9 @@ public class LogUtil {
 	public static final int WARN=4;
 	public static final int ERROR=5;
 	public static final int NOTHING=6;
-	public static final int LEVEL=VERVOSE;
+	public static final int LEVEL=NOTHING;
+	
+	public static String EXTRA_INFO="";
 	
 	public static void v(String tag,String msg){
 		if(LEVEL<=VERVOSE){
