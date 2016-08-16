@@ -3,7 +3,9 @@ package com.weather.app.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.weather.app.activity.ChooseAreaActivity;
 import com.weather.app.db.WeatherOpenHelper;
+import com.weather.app.util.LogUtil;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -15,6 +17,24 @@ public class WeatherDB {
 	 * 数据库名
 	 */
 	public static final String DB_NAME="my_weather";
+	
+	private static final String ID="id";
+	
+	private static final String PROVINCE_NAME="province_name";
+	private static final String PROVINCE_CODE="province_code";
+	private static final String PROVINCE_ID="province_id";
+	
+	private static final String CITY_NAME="city_name";
+	private static final String CITY_CODE="city_code";
+	private static final String CITY_ID="city_id";
+	
+	private static final String COUNTY_NAME="county_name";
+	private static final String COUNTY_CODE="county_code";
+	private static final String COUNTY_ID="county_id";
+	
+	private static final String TABLE_PROVINCE="Province";
+	private static final String TABLE_CITY="City";
+	private static final String TABLE_COUNTY="County";
 	
 	/**
 	 * 数据库版本名
@@ -46,9 +66,9 @@ public class WeatherDB {
 	public void saveProvince(Province province){
 		if(province!=null){
 			ContentValues values=new ContentValues();
-			values.put("province_name", province.getProvinceName());
-			values.put("province_code", province.getProvinceCode());
-			db.insert("Province", null, values);
+			values.put(PROVINCE_NAME, province.getProvinceName());
+			values.put(PROVINCE_CODE, province.getProvinceCode());
+			db.insert(TABLE_PROVINCE, null, values);
 		}
 	}
 	
@@ -57,15 +77,15 @@ public class WeatherDB {
 	 */
 	public List<Province> loadProvinces(){
 		List<Province>list=new ArrayList<Province>();
-		Cursor cursor=db.query("Province", null, null, null, null, null, null);
+		Cursor cursor=db.query(TABLE_PROVINCE, null, null, null, null, null, null);
 		if(cursor.moveToFirst()){
 			do{
 				Province province=new Province();
-				province.setId(cursor.getInt(cursor.getColumnIndex("id")));
+				province.setId(cursor.getInt(cursor.getColumnIndex(ID)));
 				province.setProvinceName(cursor.getString(cursor.
-						getColumnIndex("province_name")));
+						getColumnIndex(PROVINCE_NAME)));
 				province.setProvinceCode(cursor.getString(cursor.
-						getColumnIndex("province_code")));
+						getColumnIndex(PROVINCE_CODE)));
 				list.add(province);
 			}while(cursor.moveToNext());
 		}
@@ -78,10 +98,10 @@ public class WeatherDB {
 	public void saveCity(City city){
 		if(city!=null){
 			ContentValues values=new ContentValues();
-			values.put("city_name", city.getCityName());
-			values.put("city_code", city.getCityCode());
-			values.put("province_id", city.getProvinceId());
-			db.insert("City", null, values);
+			values.put(CITY_NAME, city.getCityName());
+			values.put(CITY_CODE, city.getCityCode());
+			values.put(PROVINCE_ID, city.getProvinceId());
+			db.insert(TABLE_CITY, null, values);
 		}
 	}
 	/**
@@ -89,15 +109,15 @@ public class WeatherDB {
 	 */
 	public List<City> loadCities(int provinceId){
 		List<City>list=new ArrayList<City>();
-		Cursor cursor=db.query("City", null, "province_id=?", new String[]{String.valueOf(provinceId)}, null, null, null);
+		Cursor cursor=db.query(TABLE_CITY, null, "province_id=?", new String[]{String.valueOf(provinceId)}, null, null, null);
 		if(cursor.moveToFirst()){
 			do{
 				City city=new City();
-				city.setId(cursor.getInt(cursor.getColumnIndex("id")));
+				city.setId(cursor.getInt(cursor.getColumnIndex(ID)));
 				city.setCityName(cursor.getString(cursor.
-						getColumnIndex("city_name")));
+						getColumnIndex(CITY_NAME)));
 				city.setCityCode(cursor.getString(cursor.
-						getColumnIndex("city_code")));
+						getColumnIndex(CITY_CODE)));
 				city.setProvinceId(provinceId);
 				list.add(city);
 			}while(cursor.moveToNext());
@@ -111,10 +131,13 @@ public class WeatherDB {
 	public void saveCounty(County county){
 		if(county!=null){
 			ContentValues values=new ContentValues();
-			values.put("county_name", county.getCountyName());
-			values.put("count_code",county.getCountyCode());
-			values.put("city_id", county.getId());
-			db.insert("County", null,values);
+			values.put(COUNTY_NAME, county.getCountyName());
+			values.put(COUNTY_CODE,county.getCountyCode());
+			values.put(CITY_ID, county.getCityId());
+			LogUtil.d(ChooseAreaActivity.TAG,"WeatherDB: inserting county:"+county.getCountyName());
+			long res;
+			res=db.insert(TABLE_COUNTY, null,values);
+			LogUtil.d(ChooseAreaActivity.TAG, "WeatherDB: db.insert county:"+county.getCountyName()+",res="+res);
 		}
 	}
 	
@@ -123,13 +146,13 @@ public class WeatherDB {
 	 */
 	public List<County>loadCounties(int cityId){
 		List<County>list=new ArrayList<County>();
-		Cursor cursor=db.query("County", null, "city_id=?", new String[]{String.valueOf(cityId)}, null, null, null);
+		Cursor cursor=db.query(TABLE_COUNTY, null, "city_id=?", new String[]{String.valueOf(cityId)}, null, null, null);
 		if(cursor.moveToFirst()){
 			do{
 				County county=new County();
-				county.setId(cursor.getInt(cursor.getColumnIndex("id")));
-				county.setCountyName(cursor.getString(cursor.getColumnIndex("county_name")));
-				county.setCountyCode(cursor.getString(cursor.getColumnIndex("county_code")));
+				county.setId(cursor.getInt(cursor.getColumnIndex(ID)));
+				county.setCountyName(cursor.getString(cursor.getColumnIndex(COUNTY_NAME)));
+				county.setCountyCode(cursor.getString(cursor.getColumnIndex(COUNTY_CODE)));
 				county.setCityId(cityId);
 				list.add(county);
 			}while(cursor.moveToNext());
