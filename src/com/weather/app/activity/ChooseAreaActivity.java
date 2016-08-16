@@ -70,12 +70,15 @@ public class ChooseAreaActivity extends Activity implements OnItemClickListener{
 	 * 当前选中的级别
 	 */
 	private int currentLevel;
-	
+	/**
+	 * 标识是否是从WeatherActivity跳转过来的
+	 */
+	private boolean isFromWeatherActivity;
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
-		boolean from_weather_activity=getIntent().getBooleanExtra("from_weather_activity", false);
-		if(!from_weather_activity){
+		isFromWeatherActivity=getIntent().getBooleanExtra("from_weather_activity", false);
+		if(!isFromWeatherActivity){
 			//如果不是从WeatherActivity点击了Home键来到这个页面的，就说明是刚刚启动
 			SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(this);
 			if(prefs.getBoolean("city_selected", false)){
@@ -290,6 +293,11 @@ public class ChooseAreaActivity extends Activity implements OnItemClickListener{
 			queryProvinces();
 		}
 		else{
+			if(isFromWeatherActivity){
+				//如果是从WeatherActivity跳转过来的,则在按下Back键后直接跳会WeatherActivity页面
+				Intent intent=new Intent(this,WeatherActivity.class);
+				startActivity(intent);
+			}
 			finish();
 		}
 	}
