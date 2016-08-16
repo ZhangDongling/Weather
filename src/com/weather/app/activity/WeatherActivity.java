@@ -1,6 +1,7 @@
 package com.weather.app.activity;
 
 import com.weather.app.R;
+import com.weather.app.service.AutoUpdateService;
 import com.weather.app.util.HttpCallbackListener;
 import com.weather.app.util.HttpUtil;
 import com.weather.app.util.LogUtil;
@@ -201,7 +202,9 @@ public class WeatherActivity extends Activity implements OnClickListener{
 		weatherInfoLayout.setVisibility(View.VISIBLE);
 		cityNameText.setVisibility(View.VISIBLE);
 		
-		
+		//Æô¶¯·þÎñ
+		Intent i=new Intent(this,AutoUpdateService.class);
+		startService(i);
 		
 	}
 }
